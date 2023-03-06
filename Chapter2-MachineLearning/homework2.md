@@ -1,3 +1,7 @@
+> 范峻铭 22121286
+>
+> 作业完整代码同步在我的githubhttps://github.com/HatcherRobotics/intelligent-information-processing
+
 #### 1、 分析为什么平方损失函数不适用于分类问题。
 
 最小化平方损失函数本质上等同于在误差服从高斯分布的假设下的极大似然估计，在分类问题下大部分时候误差并不服从高斯分布。更直观地说，平方损失函数是通过真实值与预测值间的距离反映优化的程度，而在分类问题中常用one-hot的形式进行编码，其预测值与真实值间的距离没有实际意义。
@@ -114,33 +118,49 @@ class My_SoftmaxNet(nn.Module):
 
 损失函数选择交叉熵损失函数，优化器选择小批量随机梯度下降，学习率设为0.3。
 
-
-
 L2正则化可以由全值衰减(weight decay)表示，对超参数wd选择不同的值进行实验分析，分别取1e-3,1e-2,1e-1和0。
 
 当wd取1e-3时，训练的损失与准确率如下：
 
-<img src="/run/user/1000/doc/42f522ec/loss_1e-3.png" alt="loss_1e-3" style="zoom:50%;" />
+<img src="/run/user/1000/doc/42f522ec/loss_1e-3.png" alt="loss_1e-3" style="zoom: 33%;" />
 
-<img src="/run/user/1000/doc/e2dcc664/accuracy_1e-3.png" alt="accuracy_1e-3" style="zoom:50%;" />
+<center>图1-1 wd=1e-3 loss</center>
+
+<img src="/run/user/1000/doc/e2dcc664/accuracy_1e-3.png" alt="accuracy_1e-3" style="zoom: 33%;" />
+
+<center>图1-2 wd=1e-3 accuracy</center>
 
 当wd取1e-2时，训练的损失与准确率如下：
 
-<img src="/run/user/1000/doc/609a57ba/loss_1e-2.png" style="zoom:50%;" />
+<img src="/run/user/1000/doc/609a57ba/loss_1e-2.png" style="zoom: 33%;" />
 
-<img src="/run/user/1000/doc/3257999d/accuracy_1e-2.png" style="zoom:50%;" />
+<center>图2-1 wd=1e-2 loss</center>
+
+<img src="/run/user/1000/doc/3257999d/accuracy_1e-2.png" style="zoom: 33%;" />
+
+<center>图2-2 wd=1e-2 accuracy</center>
 
 当wd取1e-1时，训练的损失与准确率如下：
 
-<img src="/run/user/1000/doc/436069b2/loss_1e-1.png" style="zoom:50%;" />
+<img src="/run/user/1000/doc/436069b2/loss_1e-1.png" style="zoom: 33%;" />
 
-<img src="/run/user/1000/doc/7ad3f57/accuracy_1e-1.png" style="zoom:50%;" />
+<center>图3-1 wd=1e-1 loss</center>
+
+<img src="/run/user/1000/doc/7ad3f57/accuracy_1e-1.png" style="zoom: 33%;" />
+
+<center>图3-2 wd=1e-1 accuracy</center>
 
 当wd取0时，即不进行正则化操作，训练的损失与准确率如下：
 
-<img src="/run/user/1000/doc/40c40a5f/loss_0.png" style="zoom:50%;" />
+<img src="/run/user/1000/doc/40c40a5f/loss_0.png" style="zoom: 33%;" />
 
-<img src="/run/user/1000/doc/40c40a5f/loss_0.png" style="zoom:50%;" />
+<center>图4-1 wd=0 loss</center>
+
+<img src="/run/user/1000/doc/6d584a6f/accuracy_0.png" style="zoom: 33%;" />
+
+<center>图4-2 wd=0 accuracy</center>
+
+
 
 通过调整权重衰减的超参数可以得到以下结论：
 
@@ -149,3 +169,13 @@ L2正则化可以由全值衰减(weight decay)表示，对超参数wd选择不�
 2.不使用正则化，由于MNIST数据集本身数据量较大，较难发生过拟合的情况，虽然模型收敛达到了较好的准确率，但最终的训练结果中测试集的准确率低于训练集。
 
 3.当正则化的取值较合理时，如0.001,0.01时，模型训练时具备了良好的对抗过拟合的能力，最终的训练结果中测试集的精度高于训练集。
+
+4.如图5所示，不使用权重衰减时，训练出的参数$w$的值会比较大，加入权值衰减后权重变得非常小。
+
+<img src="/run/user/1000/doc/5b6bbcfa/weight_0.png" style="zoom: 33%;" />
+
+<center>图5-1 wd=0 权重值</center>
+
+<img src="/run/user/1000/doc/f72423c1/weight_0.01.png" alt="weight_0.01" style="zoom:33%;" />
+
+<center>图5-2 wd=0.01 权重值</center>
