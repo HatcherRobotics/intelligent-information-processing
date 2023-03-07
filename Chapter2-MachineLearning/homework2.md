@@ -16,7 +16,7 @@ $$\therefore p(\pmb{x}|\mu,\sigma)=\prod_{i=1}^{N}p(x_i|\mu,\sigma)={(\frac{1}{\
 
 $$ \therefore log[p(\pmb{x}|\mu,\sigma)]=Nlog\frac{1}{\sqrt{2\pi}\sigma}+ \sum_{i=1}^{N}- \frac{(x_i-\mu)^2}{2\sigma^2}$$
 
-$$\because \mu^{ML}= \min\limits_{\mu}log[p(\pmb{x}|\mu,\sigma)]$$
+$$\because \mu^{ML}= \max\limits_{\mu}log[p(\pmb{x}|\mu,\sigma)]$$
 
 $$s.t. \frac{\partial{log[p(\pmb{x}|\mu,\sigma)]}}{\partial{\mu}}=0$$
 
