@@ -40,7 +40,7 @@ $$p(x|\mu,\sigma)=(\frac{1}{\sqrt{2\pi}\sigma})^N \cdot \prod_{i=1}^{N}exp{-\fra
 
 先验即为
 
-$$p(\mu)=\frac{1}{\sqrt{2\pi\sigma_{0}}}\cdot exp(- \frac{(\mu-\mu_0)^2}{2\sigma_{0}^2})$$
+$$p(\mu)=\frac{1}{\sqrt{2\pi}\sigma_{0}}\cdot exp(- \frac{(\mu-\mu_0)^2}{2\sigma_{0}^2})$$
 
 由贝叶斯公式知
 
@@ -48,7 +48,7 @@ $$p(\mu)=\frac{1}{\sqrt{2\pi\sigma_{0}}}\cdot exp(- \frac{(\mu-\mu_0)^2}{2\sigma
 
  $$ \therefore log(p(\mu|x,\sigma))\propto log(p(x|\mu,\sigma)) + log(p(\mu)) $$
 
-$$\therefore log(p(\mu|x,\sigma)) \propto Nlog(\frac{1}{\sqrt{2\pi}\sigma})+\sum_{i=1}^{N}-\frac{(x_i-\mu)^2}{2\sigma^2}+log\frac{1}{\sqrt{2\pi\sigma_{0}}}-\frac{(\mu-\mu_0)^2}{2\sigma_0^2}$$
+$$\therefore log(p(\mu|x,\sigma)) \propto Nlog(\frac{1}{\sqrt{2\pi}\sigma})+\sum_{i=1}^{N}-\frac{(x_i-\mu)^2}{2\sigma^2}+log\frac{1}{\sqrt{2\pi}\sigma_{0}}-\frac{(\mu-\mu_0)^2}{2\sigma_0^2}$$
 
 令$$\frac{\partial log(p(\mu|x,\sigma))}{\partial \mu}=\sum_{i=1}^{N}-\frac{2(x_i-\mu)}{2\sigma^2}\cdot(-1)-\frac{2(\mu-\mu_{0})}{2\sigma^2}=0$$
 
