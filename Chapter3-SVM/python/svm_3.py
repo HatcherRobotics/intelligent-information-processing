@@ -1,6 +1,5 @@
 import pandas as pd
 from sklearn import svm
-from sklearn import datasets
 from sklearn import metrics
 from sklearn import model_selection
 import numpy as np
