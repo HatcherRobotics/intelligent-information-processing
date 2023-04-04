@@ -4,27 +4,51 @@
 >
 > 代码均为原创，雷同即为抄袭
 
+[TOC]
+
+
+
 #### 数据清洗与数据加载器
 
-使用Pandas读取Excel中的数据，去掉五组气压相关的数据，对其余数据进行归一化处理，十四维数据作为特征，以以为一维数据(极大风速)为标签；
+使用Pandas读取Excel中的数据，对数据进行归一化或标准化处理，十九维数据作为特征，以一维数据(极大风速)为标签；
 
 ```python
-    def __init__(self,predict_step=3,label=1):
-        self.raw_data = np.array(pd.read_excel("weather.xlsx")).astype(float)
-        # 数据标准化
-        self.predict_step = predict_step
-        self.label = label
-        self.min = np.amin(self.raw_data)
-        self.max = np.amax(self.raw_data)
-        self.data = (self.raw_data - self.min) / (self.max - self.min)
+	def __init__(self,predict_step=3,label=5):
+    	standard_scaler = StandardScaler()
+    	raw_data = pd.read_excel("weather.xlsx")
+    	self.predict_step = predict_step
+    	self.label = label
+    	#标准化
+    	self.data = standard_scaler.fit_transform(raw_data)
+    	self.mean = standard_scaler.mean_[label]
+    	self.sd = math.sqrt(standard_scaler.var_[label])
 
 ```
 
-反归一化函数在评估模型以及数据可视化中用到，将归一化数据变换为原始数据的尺度；
+```python
+    def __init__(self,predict_step=3,label=5):
+        minmax_scaler = MinMaxScaler()
+        raw_data = pd.read_excel("weather.xlsx")
+        self.predict_step = predict_step
+        self.label = label
+        #归一化
+        self.data = minmax_scaler.fit_transform(raw_data)
+        self.min = minmax_scaler.data_min_[label]
+        self.max = minmax_scaler.data_max_[label]
+```
+
+反归一化/标准化函数在评估模型以及数据可视化中用到，将归一化/标准化数据变换为原始数据的尺度；
 
 ```python
     def denormalize(self, x):
-        return x * (self.max - self.min) + self.min
+        x = x*(self.max-self.min)+self.min
+        return x
+```
+
+```python
+    def denormalize(self, x):
+        x = x*self.sd+self.mean
+        return x
 ```
 
 采用滑动窗口的方式建立数据集，步长为1，序列长度为50，预测布长为3；
@@ -120,6 +144,10 @@ class LSTMNet(nn.Module):
 
 <img src="/run/user/1000/doc/3d4a9753/lstm_test_3h.png" style="zoom:25%;" />
 
+##### 总结
+
+LSTM较好的完成了预测任务，但其预测具有滞后性，且预测长度越长情况越严重。
+
 #### TCN：时间卷积网络
 
 考虑到非因果的普通一维卷积会涉及到未来信息，选择以空洞因果卷积为基础的时间卷积网络。
@@ -197,7 +225,7 @@ class TCNet(nn.Module):
 
 ##### 模型训练
 
-取学习率为0.001，优化器选择Adam，训练轮次为80轮，批量大小为16，损失函数选择均方损失，堆叠三个TCN块，其空洞系数分别为1，2，4，卷积核的大小分别为5，5，3，输出通道数分别为32，16，8，训练结果如下图所示
+TCN的收敛速度要明显慢于LSTM，取学习率为0.001，优化器选择Adam，训练轮次为160轮，批量大小为16，损失函数选择均方损失，堆叠三个TCN块，其空洞系数分别为1，2，4，卷积核的大小分别为5，5，3，输出通道数分别为32，16，8，训练结果如下图所示
 
 <img src="/run/user/1000/doc/2445fb3a/tcn_loss.png" style="zoom:25%;" />
 
@@ -232,6 +260,10 @@ class TCNet(nn.Module):
 <img src="/run/user/1000/doc/baadc434/tcn_test_2h.png" style="zoom:25%;" />
 
 <img src="/run/user/1000/doc/5d4122d2/tcn_test_3h.png" style="zoom:25%;" />
+
+##### 总结
+
+TCN在测试集上的表现远差于其在验证集上的表现，虽然其在验证集上表现更好，但与LSTM相比其训练时间长且训练效果差。
 
 #### SVM：支持向量机
 
@@ -273,16 +305,18 @@ predict(x,y,50,3,svr_rbf,eval,visulization)
 
 <img src="/run/user/1000/doc/85a374d4/svm_3h.png" style="zoom:25%;" />
 
-三种方法对比
+#### 三种算法对比
 
-|      | RMSE                   | MAE                  | MAPE                   |
-| ---- | ---------------------- | -------------------- | ---------------------- |
-| LSTM | 3.402497770937961      | 2.921602964401245    | **36.95100545883179%** |
-| TCN  | 5.746902294830505      | 5.355382919311523    | 70.02002596855164%     |
-| SVM  | **2.6913743661902703** | **2.00855275156032** | 56.84138900980481%     |
+|                    | RMSE                   | MAE                   | MAPE                    |
+| ------------------ | ---------------------- | --------------------- | ----------------------- |
+| LSTM_MinMaxScale   | 2.1156738050232304     | 1.7285808324813843    | 25.489583611488342%     |
+| LSTM_StandardScale | **1.9344022659574036** | **1.549852967262268** | **23.301874101161957%** |
+| TCN_MinMaxScale    | 2.9587482824026456     | 2.588508367538452     | 32.5937956571579%       |
+| TCN_StandardScale  | 6.710886341117575      | 6.45556640625         | 86.65335774421692%      |
+| SVM                | 2.692101691892707      | 2.007541401442317     | 56.64045941429213%      |
 
-神经网络存在很大问题，虽然在测试集上能反映出大致的变换趋势，但在具体数值上存在较大误差；
+实验证明，用标准化预处理数据后送入LSTM的预测精度最高；
 
-TCN在验证集上的表现强于LSTM，但在测试集上不如LSTM，可能出现了过拟合。
+TCN过拟合情况严重;
 
-SVM纯粹从数学角度进行拟合，效果稳定。
+SVM纯粹从数学角度进行拟合，效果稳定，但是不如LSTM。
